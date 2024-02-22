@@ -1,4 +1,4 @@
-import {injectable, BindingScope, inject} from '@loopback/core';
+import {injectable, BindingScope, inject, service} from '@loopback/core';
 import {repository} from '@loopback/repository';
 import {UserProfile, securityId} from '@loopback/security';
 import {
@@ -17,7 +17,13 @@ import {
 import {compare, hashSync} from 'bcryptjs';
 import {DateTime} from 'luxon';
 import _ from 'lodash';
-import {checkOldPasswords, generateRandomString} from '../utils/helper';
+import {
+  checkOldPasswords,
+  generateRandomNumber,
+  generateRandomString,
+} from '../utils/helper';
+// import { serviceProxy } from '@loopback/service-proxy';
+import { EmailService } from './email.service';
 
 type SignUpParams = {
   payload: {
@@ -50,7 +56,7 @@ type ForgotPasswordParams = {
 
 type ResetPasswordParams = {
   payload: {
-    token: string;
+    userId: string;
     newPassword: string;
     confirmPassword: string;
   };
@@ -76,6 +82,8 @@ export class UserService {
     public userSessionRepository: UserSessionRepository,
     @inject(TokenServiceBindings.TOKEN_SERVICE)
     public jwtService: TokenService,
+    @service(EmailService)
+    public emailService: EmailService
   ) {}
 
   async signUp({payload}: SignUpParams) {
@@ -87,7 +95,7 @@ export class UserService {
       userId: user.id,
       password: hashSync(passwordValue),
     });
-    return user;
+    return serviceGenieConstant.AuthStatus.SIGN_UP_SUCCESS;
   }
 
   async login({payload}: LoginParams) {
@@ -153,7 +161,7 @@ export class UserService {
       _v: session._v + 1,
     });
 
-    return {message: 'Logout Successful'};
+    return serviceGenieConstant.AuthStatus.LOG_OUT_SUCCESS;
   }
 
   async forgotPassword({payload}: ForgotPasswordParams) {
@@ -165,29 +173,28 @@ export class UserService {
     if (!checkEmail) {
       throw new HttpErrors[404](customErrorMsg.authErrors.EMAIL_NOT_FOUND);
     }
-    const generatedToken = generateRandomString(200);
+    const generatedNumber = generateRandomNumber(6);
     await this.userRepository.updateById(checkEmail.id, {
       forgotPasswordToken: {
-        token: generatedToken,
+        token: (await generatedNumber).toString(),
         status: serviceGenieConstant.sessionstatus.CURRENT,
         createdAt: DateTime.utc().toJSDate(),
-        expireAt: DateTime.utc().toJSDate(),
+        expireAt: DateTime.utc().plus({minutes: 5}).toJSDate(),
         expiredAt: null,
       },
     });
-    return generatedToken;
+
+    await this.emailService.sendOTP(payload.emailId,await generatedNumber)
+
+    return {message: `OTP sent in the Email`};
   }
 
-  async resetPassword({payload}: ResetPasswordParams) {
-    if (payload.newPassword !== payload.confirmPassword) {
-      throw new HttpErrors[403](
-        customErrorMsg.authErrors.PASSWORDS_DO_NOT_MATCH,
-      );
-    }
+  async verifyResetOtp(otp:string){
     const verifyTOken = await this.userRepository.findOne({
       where: <any>{
-        'forgotPasswordToken.token': payload.token,
-        'forgotPasswordToken.status': serviceGenieConstant.sessionstatus.CURRENT,
+        'forgotPasswordToken.token': otp,
+        'forgotPasswordToken.status':
+          serviceGenieConstant.sessionstatus.CURRENT,
       },
     });
     if (!verifyTOken) {
@@ -201,15 +208,49 @@ export class UserService {
       ).valueOf() < DateTime.utc().valueOf()
     ) {
       await this.userRepository.updateById(verifyTOken.id, <any>{
-        'forgotPasswordToken.status': serviceGenieConstant.sessionstatus.EXPIRED,
+        'forgotPasswordToken.status':
+          serviceGenieConstant.sessionstatus.EXPIRED,
         'forgotPasswordToken.expiredAt': expiredTime,
       });
       throw new HttpErrors[403](customErrorMsg.authErrors.TOKEN_EXPIRED);
     }
+    return verifyTOken.id;
+  }
+
+  async resetPassword({payload}: ResetPasswordParams) {
+    if (payload.newPassword !== payload.confirmPassword) {
+      throw new HttpErrors[403](
+        customErrorMsg.authErrors.PASSWORDS_DO_NOT_MATCH,
+      );
+    }
+    // const verifyTOken = await this.userRepository.findOne({
+    //   where: <any>{
+    //     'forgotPasswordToken.token': payload.token,
+    //     'forgotPasswordToken.status':
+    //       serviceGenieConstant.sessionstatus.CURRENT,
+    //   },
+    // });
+    // if (!verifyTOken) {
+    //   throw new HttpErrors[404](customErrorMsg.authErrors.INVALID_TOKEN);
+    // }
+
+    // let expiredTime = verifyTOken?.forgotPasswordToken?.expiredAt;
+    // if (
+    //   DateTime.fromJSDate(
+    //     <any>verifyTOken.forgotPasswordToken?.expireAt,
+    //   ).valueOf() < DateTime.utc().valueOf()
+    // ) {
+    //   await this.userRepository.updateById(verifyTOken.id, <any>{
+    //     'forgotPasswordToken.status':
+    //       serviceGenieConstant.sessionstatus.EXPIRED,
+    //     'forgotPasswordToken.expiredAt': expiredTime,
+    //   });
+    //   throw new HttpErrors[403](customErrorMsg.authErrors.TOKEN_EXPIRED);
+    // }
 
     const userId: any = await this.userCredentialsRepository.findOne({
       where: {
-        userId: verifyTOken.id,
+        userId: payload.userId,
       },
     });
 
@@ -230,7 +271,7 @@ export class UserService {
       passwordArray.unshift(currentPassword);
     }
 
-    await this.userCredentialsRepository.updateById(verifyTOken?.id, <any>{
+    await this.userCredentialsRepository.updateById(userId?.id, <any>{
       'forgotPasswordToken.status': serviceGenieConstant.sessionstatus.EXPIRED,
       'forgotPasswordToken.expiredAt': DateTime.utc().toJSDate(),
     });

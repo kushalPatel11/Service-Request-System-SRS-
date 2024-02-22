@@ -302,6 +302,49 @@ export class AuthController {
     return this.userService.forgotPassword({payload});
   }
 
+  @post('/auth/verify-otp', {
+    summary: 'Verify OTP API Endpoint',
+    responses: {
+      '200': {
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              required: ['otp'],
+              properties: {
+                otp: {
+                  type: 'string',
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  })
+  async forgotPasswordOtp(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: {
+            type: 'object',
+            required: ['otp'],
+            properties: {
+              otp: {
+                type: 'string',
+              },
+            },
+          },
+        },
+      },
+    })
+    payload: {
+      otp: string;
+    }
+  ): Promise<any> {
+    return this.userService.verifyResetOtp(payload.otp);
+  }
+
   @post('/auth/reset-password', {
     summary: 'Reset Password API Endpoint',
     responses: {
@@ -310,9 +353,9 @@ export class AuthController {
           'application/json': {
             schema: {
               type: 'object',
-              required: ['token', 'newPassword', 'confirmPassword'],
+              required: ['userId', 'newPassword', 'confirmPassword'],
               properties: {
-                token: {
+                userId: {
                   type: 'string',
                   pattern: '^(?! ).*[^ ]$',
                   errorMessage: {
@@ -347,9 +390,9 @@ export class AuthController {
         'application/json': {
           schema: {
             type: 'object',
-            required: ['token', 'newPassword', 'confirmPassword'],
+            required: ['userId', 'newPassword', 'confirmPassword'],
             properties: {
-              token: {
+              userId: {
                 type: 'string',
                 pattern: '^(?! ).*[^ ]$',
                 errorMessage: {
@@ -376,7 +419,7 @@ export class AuthController {
       },
     })
     payload: {
-      token: string;
+      userId: string;
       newPassword: string;
       confirmPassword: string;
     },

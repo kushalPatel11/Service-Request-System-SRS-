@@ -27,3 +27,12 @@ export const checkOldPasswords = async (
   }
 };
 
+export const generateRandomNumber = async (length: number) => {
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    // Generate random digit from 0 to 9 and append to result
+    result += Math.floor(Math.random() * 10);
+  }
+  // Parse the result as a number and return
+  return parseInt(result, 10);
+};

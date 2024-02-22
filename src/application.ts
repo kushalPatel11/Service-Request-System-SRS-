@@ -24,7 +24,7 @@ import {
   AuthorizationOptions,
   AuthorizationTags,
 } from '@loopback/authorization';
-import {MyAuthorizationProvider} from './services';
+import {MyAuthorizationProvider, EmailService} from './services';
 
 export {ApplicationConfig};
 
@@ -88,5 +88,7 @@ export class ServiceGenieApplication extends BootMixin(
     this.bind('authorizationProviders.my-authorizer-provider')
       .toProvider(MyAuthorizationProvider)
       .tag(AuthorizationTags.AUTHORIZER);
+
+    this.bind('services.EmailService').toClass(EmailService);
   }
 }
