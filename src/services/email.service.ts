@@ -8,17 +8,17 @@ export class EmailService {
   async sendOTP(email: string, otp: number): Promise<void> {
     // Create reusable transporter object using SMTP transport
     let transporter = nodemailer.createTransport({
-      host: 'smtp.ethereal.email',
-      port: 587,
+      host: 'smtp.elasticemail.com',
+      port: 2525,
       auth: {
-        user: 'mercedes.kshlerin23@ethereal.email',
-        pass: 'QW54yeMDnrkp29N6RS',
+        user: 'kushalpatel1218@gmail.com',
+        pass: 'AF53599083CA0DD2934CF4D6F158B84672BA',
       },
     });
 
     // Send mail with defined transport object
     let info = await transporter.sendMail({
-      from: 'ptron047@gmail.com',
+      from: 'kushalpatel1218@gmail.com',
       to: email,
       subject: 'OTP Verification',
       html: `<div style="font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2">
