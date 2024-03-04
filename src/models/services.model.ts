@@ -1,4 +1,6 @@
-import {Entity, model, property} from '@loopback/repository';
+import {Entity, belongsTo, model, property} from '@loopback/repository';
+import {ServiceCategory} from './service-category.model';
+import {DateTime} from 'luxon';
 
 @model()
 export class Services extends Entity {
@@ -9,45 +11,88 @@ export class Services extends Entity {
   })
   id?: string;
 
-  @property({
-    type: 'string',
-    required: true,
-  })
+  @belongsTo(
+    () => ServiceCategory,
+    {
+      name: 'serviceCategory',
+    },
+    {
+      type: 'string',
+      required: true,
+      mongodb: {dataType: 'ObjectId'},
+    },
+  )
   serviceCategoryId: string;
 
   @property({
     type: 'string',
     required: true,
+    jsonSchema: {
+      pattern: '^(?! ).*[^ ]$',
+      errorMessage: {
+        pattern: `can't be blank`,
+      },
+    },
   })
   name: string;
 
   @property({
     type: 'string',
     required: true,
+    jsonSchema: {
+      pattern: '^(?! ).*[^ ]$',
+      errorMessage: {
+        pattern: `can't be blank`,
+      },
+    },
   })
   companyName: string;
 
   @property({
     type: 'string',
     required: true,
+    jsonSchema: {
+      pattern: '^(?! ).*[^ ]$',
+      errorMessage: {
+        pattern: `can't be blank`,
+      },
+    },
   })
   description: string;
 
   @property({
     type: 'string',
     required: true,
+    jsonSchema: {
+      format: 'email',
+      errorMessage: {
+        pattern: `Invalid Email`,
+      },
+    },
   })
   email: string;
 
   @property({
     type: 'string',
     required: true,
+    jsonSchema: {
+      pattern: '^\\d{1,10}$',
+      errorMessage: {
+        pattern: `Invalid Phone Number.`,
+      },
+    },
   })
   phoneNumber: string;
 
   @property({
     type: 'string',
     required: true,
+    jsonSchema: {
+      pattern: '^(?! ).*[^ ]$',
+      errorMessage: {
+        pattern: `can't be blank`,
+      },
+    },
   })
   address: string;
 
@@ -66,27 +111,35 @@ export class Services extends Entity {
   @property({
     type: 'string',
     required: true,
+    jsonSchema: {
+      pattern: `^(http:\\/\\/|https:\\/\\/)?(www\\.)?[a-zA-Z0-9-_\\.]+\\.[a-zA-Z]+(:\\d+)?(\\/[a-zA-Z\\d\\.\\-_]*)*[a-zA-Z.!@#$%&=-_'":,.?\\d*)(]*$`,
+      errorMesaage: {
+        pattern: 'Website Invalid',
+      },
+    },
   })
   website: string;
 
   @property({
     type: 'string',
     required: true,
+    default: () => DateTime.utc().toJSDate(),
   })
-  createdAt: string;
+  createdAt: DateTime;
 
   @property({
     type: 'string',
     required: true,
+    default: () => DateTime.utc().toJSDate(),
   })
-  updatedAt: string;
+  updatedAt: DateTime;
 
   @property({
     type: 'number',
     required: true,
+    default: 0,
   })
   _v: number;
-
 
   constructor(data?: Partial<Services>) {
     super(data);

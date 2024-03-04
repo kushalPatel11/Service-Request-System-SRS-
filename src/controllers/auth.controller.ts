@@ -78,14 +78,14 @@ export class AuthController {
                 },
                 phoneNumber: {
                   type: 'string',
-                  pattern: '^\\d{1,10}$',
+                  pattern: '^\\d{10}$',
                   errorMessage: {
                     pattern: customErrorMsg.authErrors.INVALID_PHONE_NUMBER,
                   },
                 },
                 countryCode: {
                   type: 'string',
-                  pattern: '^\\+\\d{1,2}$',
+                  pattern: '^\\+\\d{1,3}$',
                   errorMessage: {
                     pattern: customErrorMsg.authErrors.INVALID_COUNTRY_CODE,
                   },
