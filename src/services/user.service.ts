@@ -23,7 +23,7 @@ import {
   generateRandomString,
 } from '../utils/helper';
 // import { serviceProxy } from '@loopback/service-proxy';
-import { EmailService } from './email.service';
+import {EmailService} from './email.service';
 
 type SignUpParams = {
   payload: {
@@ -83,7 +83,7 @@ export class UserService {
     @inject(TokenServiceBindings.TOKEN_SERVICE)
     public jwtService: TokenService,
     @service(EmailService)
-    public emailService: EmailService
+    public emailService: EmailService,
   ) {}
 
   async signUp({payload}: SignUpParams) {
@@ -140,7 +140,12 @@ export class UserService {
         minutes: 20,
       }),
     });
-    return userSession.jwt;
+
+    let response = {
+      jwt: userSession.jwt,
+      userType: user.userType,
+    };
+    return response;
   }
 
   async logout({sessionId}: LogoutParams) {
@@ -184,12 +189,12 @@ export class UserService {
       },
     });
 
-    await this.emailService.sendOTP(payload.emailId,await generatedNumber)
+    await this.emailService.sendOTP(payload.emailId, await generatedNumber);
 
     return {message: `OTP sent in the Email`};
   }
 
-  async verifyResetOtp(otp:string){
+  async verifyResetOtp(otp: string) {
     const verifyTOken = await this.userRepository.findOne({
       where: <any>{
         'forgotPasswordToken.token': otp,
