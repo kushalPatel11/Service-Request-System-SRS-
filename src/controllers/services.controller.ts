@@ -1,150 +1,495 @@
-import {
-  Count,
-  CountSchema,
-  Filter,
-  FilterExcludingWhere,
-  repository,
-  Where,
-} from '@loopback/repository';
-import {
-  post,
-  param,
-  get,
-  getModelSchemaRef,
-  patch,
-  put,
-  del,
-  requestBody,
-  response,
-} from '@loopback/rest';
-import {Services} from '../models';
+import {repository} from '@loopback/repository';
+import {get, patch, post, requestBody} from '@loopback/rest';
 import {ServicesRepository} from '../repositories';
+import {customErrorMsg} from '../keys';
+import {service} from '@loopback/core';
+import {ServicesService} from '../services';
 
 export class ServicesController {
   constructor(
     @repository(ServicesRepository)
-    public servicesRepository : ServicesRepository,
+    public servicesRepository: ServicesRepository,
+    @service(ServicesService)
+    public servicesService: ServicesService,
   ) {}
 
-  @post('/services')
-  @response(200, {
-    description: 'Services model instance',
-    content: {'application/json': {schema: getModelSchemaRef(Services)}},
-  })
-  async create(
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(Services, {
-            title: 'NewServices',
-            exclude: ['id'],
-          }),
-        },
-      },
-    })
-    services: Omit<Services, 'id'>,
-  ): Promise<Services> {
-    return this.servicesRepository.create(services);
-  }
-
-  @get('/services/count')
-  @response(200, {
-    description: 'Services model count',
-    content: {'application/json': {schema: CountSchema}},
-  })
-  async count(
-    @param.where(Services) where?: Where<Services>,
-  ): Promise<Count> {
-    return this.servicesRepository.count(where);
-  }
-
-  @get('/services')
-  @response(200, {
-    description: 'Array of Services model instances',
-    content: {
-      'application/json': {
-        schema: {
-          type: 'array',
-          items: getModelSchemaRef(Services, {includeRelations: true}),
+  @post('/services/add-service', {
+    summary: 'Add vendor Service API Endpoint',
+    responses: {
+      '200': {
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              required: [
+                'serviceCategoryId',
+                'name',
+                'companyName',
+                'description',
+                'email',
+                'phoneNumber',
+                'address',
+                'availability',
+                'price',
+                'website',
+              ],
+              properties: {
+                serviceCategoryId: {
+                  type: 'string',
+                  pattern: '^(?! ).*[^ ]$',
+                  errorMessage: {
+                    pattern: `Can't be Blank`,
+                  },
+                  default: 'MongoDB Valid Id',
+                },
+                name: {
+                  type: 'string',
+                  pattern: '^(?! ).*[^ ]$',
+                  errorMessage: {
+                    pattern: `Can't be Blank`,
+                  },
+                  default: 'Service 1',
+                },
+                companyName: {
+                  type: 'string',
+                  pattern: '^(?! ).*[^ ]$',
+                  errorMessage: {
+                    pattern: `Can't be Blank`,
+                  },
+                  default: 'Company Name 1',
+                },
+                description: {
+                  type: 'string',
+                  pattern: '^(?! ).*[^ ]$',
+                  errorMessage: {
+                    pattern: `Can't be Blank`,
+                  },
+                  default: 'A short overview of the service been provided',
+                },
+                email: {
+                  type: 'string',
+                  format: 'email',
+                  errorMessage: {
+                    pattern: customErrorMsg.authErrors.INVALID_EMAIL,
+                  },
+                },
+                phoneNumber: {
+                  type: 'string',
+                  pattern: '^\\d{10}$',
+                  errorMessage: {
+                    pattern: customErrorMsg.authErrors.INVALID_PHONE_NUMBER,
+                  },
+                },
+                address: {
+                  type: 'string',
+                  pattern: '^(?! ).*[^ ]$',
+                  errorMessage: {
+                    pattern: `Can't be Blank`,
+                  },
+                  default: 'Address line 1,2 city,state, Zip code.',
+                },
+                availability: {
+                  type: 'string',
+                  pattern: '^(?! ).*[^ ]$',
+                  errorMessage: {
+                    pattern: `Can't be Blank`,
+                  },
+                  default:
+                    'Add your weekly available hours and any exceptions.',
+                },
+                price: {
+                  type: 'string',
+                  pattern: '^(?! ).*[^ ]$',
+                  errorMessage: {
+                    pattern: `Can't be Blank`,
+                  },
+                  default: '100',
+                },
+                website: {
+                  type: 'string',
+                  pattern: `^(http:\\/\\/|https:\\/\\/)?(www\\.)?[a-zA-Z0-9-_\\.]+\\.[a-zA-Z]+(:\\d+)?(\\/[a-zA-Z\\d\\.\\-_]*)*[a-zA-Z.!@#$%&=-_'":,.?\\d*)(]*$`,
+                  errorMessage: {
+                    pattern: `Invalid Website`,
+                  },
+                  default: 'www.yourWebsite.com',
+                },
+              },
+            },
+          },
         },
       },
     },
   })
-  async find(
-    @param.filter(Services) filter?: Filter<Services>,
-  ): Promise<Services[]> {
-    return this.servicesRepository.find(filter);
-  }
-
-  @patch('/services')
-  @response(200, {
-    description: 'Services PATCH success count',
-    content: {'application/json': {schema: CountSchema}},
-  })
-  async updateAll(
+  async addService(
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Services, {partial: true}),
+          schema: {
+            type: 'object',
+            required: [
+              'serviceCategoryId',
+              'name',
+              'companyName',
+              'description',
+              'email',
+              'phoneNumber',
+              'address',
+              'availability',
+              'price',
+              'website',
+            ],
+            properties: {
+              serviceCategoryId: {
+                type: 'string',
+                pattern: '^(?! ).*[^ ]$',
+                errorMessage: {
+                  pattern: `Can't be Blank`,
+                },
+                default: 'MongoDB Valid Id',
+              },
+              name: {
+                type: 'string',
+                pattern: '^(?! ).*[^ ]$',
+                errorMessage: {
+                  pattern: `Can't be Blank`,
+                },
+                default: 'Service 1',
+              },
+              companyName: {
+                type: 'string',
+                pattern: '^(?! ).*[^ ]$',
+                errorMessage: {
+                  pattern: `Can't be Blank`,
+                },
+                default: 'Company Name 1',
+              },
+              description: {
+                type: 'string',
+                pattern: '^(?! ).*[^ ]$',
+                errorMessage: {
+                  pattern: `Can't be Blank`,
+                },
+                default: 'A short overview of the service been provided',
+              },
+              email: {
+                type: 'string',
+                format: 'email',
+                errorMessage: {
+                  pattern: customErrorMsg.authErrors.INVALID_EMAIL,
+                },
+              },
+              phoneNumber: {
+                type: 'string',
+                pattern: '^\\d{10}$',
+                errorMessage: {
+                  pattern: customErrorMsg.authErrors.INVALID_PHONE_NUMBER,
+                },
+              },
+              address: {
+                type: 'string',
+                pattern: '^(?! ).*[^ ]$',
+                errorMessage: {
+                  pattern: `Can't be Blank`,
+                },
+                default: 'Address line 1,2 city,state, Zip code.',
+              },
+              availability: {
+                type: 'string',
+                pattern: '^(?! ).*[^ ]$',
+                errorMessage: {
+                  pattern: `Can't be Blank`,
+                },
+                default: 'Add your weekly available hours and any exceptions.',
+              },
+              price: {
+                type: 'string',
+                pattern: '^(?! ).*[^ ]$',
+                errorMessage: {
+                  pattern: `Can't be Blank`,
+                },
+                default: '100',
+              },
+              website: {
+                type: 'string',
+                pattern: `^(http:\\/\\/|https:\\/\\/)?(www\\.)?[a-zA-Z0-9-_\\.]+\\.[a-zA-Z]+(:\\d+)?(\\/[a-zA-Z\\d\\.\\-_]*)*[a-zA-Z.!@#$%&=-_'":,.?\\d*)(]*$`,
+                errorMessage: {
+                  pattern: `Invalid Website`,
+                },
+                default: 'www.yourWebsite.com',
+              },
+            },
+          },
         },
       },
     })
-    services: Services,
-    @param.where(Services) where?: Where<Services>,
-  ): Promise<Count> {
-    return this.servicesRepository.updateAll(services, where);
+    payload: {
+      serviceCategoryId: string;
+      name: string;
+      companyName: string;
+      description: string;
+      email: string;
+      phoneNumber: string;
+      address: string;
+      availability: string;
+      price: string;
+      website: string;
+    },
+  ): Promise<any> {
+    return this.servicesService.addService({payload});
   }
 
-  @get('/services/{id}')
-  @response(200, {
-    description: 'Services model instance',
-    content: {
-      'application/json': {
-        schema: getModelSchemaRef(Services, {includeRelations: true}),
+  @get('/services', {
+    summary: 'Get Services API Endpoint',
+    responses: {
+      '200': {},
+    },
+  })
+  async getServices() {
+    return this.servicesService.getService();
+  }
+
+  @patch('/services/update-service', {
+    summary: 'Update Service API Endpoint',
+    responses: {
+      '200': {
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              required: [
+                'serviceId',
+                'serviceCategoryId',
+                'name',
+                'companyName',
+                'description',
+                'description',
+                'email',
+                'phoneNumber',
+                'address',
+                'availability',
+                'price',
+                'website',
+              ],
+              properties: {
+                serviceId: {
+                  type: 'string',
+                  pattern: '^(?! ).*[^ ]$',
+                  errormessage: {
+                    pattern: `Can't be blank`,
+                  },
+                  default: 'A valid MongoDB Id',
+                },
+                serviceCategoryId: {
+                  type: 'string',
+                  pattern: '^(?! ).*[^ ]$',
+                  errormessage: {
+                    pattern: `Can't be blank`,
+                  },
+                  default: 'A valid MongoDB Id',
+                },
+                name: {
+                  type: 'string',
+                  pattern: '^(?! ).*[^ ]$',
+                  errorMessage: {
+                    pattern: `Can't be Blank`,
+                  },
+                  default: 'Updated name of the service',
+                },
+                companyName: {
+                  type: 'string',
+                  pattern: '^(?! ).*[^ ]$',
+                  errorMesage: {
+                    pattern: `Can't be blank`,
+                  },
+                  default: 'Updated Comapny Name',
+                },
+                description: {
+                  type: 'string',
+                  pattern: '^(?! ).*[^ ]$',
+                  errorMessage: {
+                    pattern: `Can't be Blank`,
+                  },
+                  default: 'Updated description of the service',
+                },
+                email: {
+                  type: 'string',
+                  format: 'email',
+                  errorMessage: {
+                    pattern: customErrorMsg.authErrors.INVALID_EMAIL,
+                  },
+                },
+                phoneNumber: {
+                  type: 'string',
+                  pattern: '^\\d{10}$',
+                  errorMessage: {
+                    pattern: customErrorMsg.authErrors.INVALID_PHONE_NUMBER,
+                  },
+                },
+                address: {
+                  type: 'string',
+                  pattern: '^(?! ).*[^ ]$',
+                  errorMessage: {
+                    pattern: `Can't be Blank`,
+                  },
+                  default: 'Updated Address',
+                },
+                availability: {
+                  type: 'string',
+                  pattern: '^(?! ).*[^ ]$',
+                  errorMessage: {
+                    pattern: `Can't be Blank`,
+                  },
+                  default: 'Updated Availability',
+                },
+                price: {
+                  type: 'string',
+                  pattern: '^(?! ).*[^ ]$',
+                  errorMessage: {
+                    pattern: `Can't be Blank`,
+                  },
+                  default: 'Updated Price',
+                },
+                website: {
+                  type: 'string',
+                  pattern: `^(http:\\/\\/|https:\\/\\/)?(www\\.)?[a-zA-Z0-9-_\\.]+\\.[a-zA-Z]+(:\\d+)?(\\/[a-zA-Z\\d\\.\\-_]*)*[a-zA-Z.!@#$%&=-_'":,.?\\d*)(]*$`,
+                  errorMessage: {
+                    pattern: 'Invalid Website',
+                  },
+                  default: 'www.updatedWebsite.com',
+                },
+              },
+            },
+          },
+        },
       },
     },
   })
-  async findById(
-    @param.path.string('id') id: string,
-    @param.filter(Services, {exclude: 'where'}) filter?: FilterExcludingWhere<Services>
-  ): Promise<Services> {
-    return this.servicesRepository.findById(id, filter);
-  }
-
-  @patch('/services/{id}')
-  @response(204, {
-    description: 'Services PATCH success',
-  })
-  async updateById(
-    @param.path.string('id') id: string,
+  async updateService(
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Services, {partial: true}),
+          schema: {
+            type: 'object',
+            required: [
+              'serviceId',
+              'serviceCategoryId',
+              'name',
+              'companyName',
+              'description',
+              'description',
+              'email',
+              'phoneNumber',
+              'address',
+              'availability',
+              'price',
+              'website',
+            ],
+            properties: {
+              serviceId: {
+                type: 'string',
+                pattern: '^(?! ).*[^ ]$',
+                errormessage: {
+                  pattern: `Can't be blank`,
+                },
+                default: 'A valid MongoDB Id',
+              },
+              serviceCategoryId: {
+                type: 'string',
+                pattern: '^(?! ).*[^ ]$',
+                errormessage: {
+                  pattern: `Can't be blank`,
+                },
+                default: 'A valid MongoDB Id',
+              },
+              name: {
+                type: 'string',
+                pattern: '^(?! ).*[^ ]$',
+                errorMessage: {
+                  pattern: `Can't be Blank`,
+                },
+                default: 'Updated name of the service',
+              },
+              companyName: {
+                type: 'string',
+                pattern: '^(?! ).*[^ ]$',
+                errorMesage: {
+                  pattern: `Can't be blank`,
+                },
+                default: 'Updated Comapny Name',
+              },
+              description: {
+                type: 'string',
+                pattern: '^(?! ).*[^ ]$',
+                errorMessage: {
+                  pattern: `Can't be Blank`,
+                },
+                default: 'Updated description of the service',
+              },
+              email: {
+                type: 'string',
+                format: 'email',
+                errorMessage: {
+                  pattern: customErrorMsg.authErrors.INVALID_EMAIL,
+                },
+              },
+              phoneNumber: {
+                type: 'string',
+                pattern: '^\\d{10}$',
+                errorMessage: {
+                  pattern: customErrorMsg.authErrors.INVALID_PHONE_NUMBER,
+                },
+              },
+              address: {
+                type: 'string',
+                pattern: '^(?! ).*[^ ]$',
+                errorMessage: {
+                  pattern: `Can't be Blank`,
+                },
+                default: 'Updated Address',
+              },
+              availability: {
+                type: 'string',
+                pattern: '^(?! ).*[^ ]$',
+                errorMessage: {
+                  pattern: `Can't be Blank`,
+                },
+                default: 'Updated Availability',
+              },
+              price: {
+                type: 'string',
+                pattern: '^(?! ).*[^ ]$',
+                errorMessage: {
+                  pattern: `Can't be Blank`,
+                },
+                default: 'Updated Price',
+              },
+              website: {
+                type: 'string',
+                pattern: `^(http:\\/\\/|https:\\/\\/)?(www\\.)?[a-zA-Z0-9-_\\.]+\\.[a-zA-Z]+(:\\d+)?(\\/[a-zA-Z\\d\\.\\-_]*)*[a-zA-Z.!@#$%&=-_'":,.?\\d*)(]*$`,
+                errorMessage: {
+                  pattern: 'Invalid Website',
+                },
+                default: 'www.updatedWebsite.com',
+              },
+            },
+          },
         },
       },
     })
-    services: Services,
+    payload: {
+      serviceId: string;
+      serviceCategoryId: string;
+      name: string;
+      companyName: string;
+      description: string;
+      email: string;
+      phoneNUmber: string;
+      address: string;
+      availability: string;
+      price: string;
+      website: string;
+    },
   ): Promise<void> {
-    await this.servicesRepository.updateById(id, services);
-  }
-
-  @put('/services/{id}')
-  @response(204, {
-    description: 'Services PUT success',
-  })
-  async replaceById(
-    @param.path.string('id') id: string,
-    @requestBody() services: Services,
-  ): Promise<void> {
-    await this.servicesRepository.replaceById(id, services);
-  }
-
-  @del('/services/{id}')
-  @response(204, {
-    description: 'Services DELETE success',
-  })
-  async deleteById(@param.path.string('id') id: string): Promise<void> {
-    await this.servicesRepository.deleteById(id);
+    return this.servicesService.updateServiceById({payload});
   }
 }

@@ -21,6 +21,7 @@ type AddService = {
 
 type UpdateServiceById = {
   payload: {
+    serviceId: string;
     serviceCategoryId: string;
     name: string;
     companyName: string;
@@ -32,7 +33,6 @@ type UpdateServiceById = {
     price: string;
     website: string;
   };
-  serviceId: string;
 };
 
 @injectable({scope: BindingScope.TRANSIENT})
@@ -52,8 +52,8 @@ export class ServicesService {
     return getService;
   }
 
-  async updateServiceById({payload, serviceId}: UpdateServiceById) {
-    const findService = await this.servicesRepository.findById(serviceId);
+  async updateServiceById({payload}: UpdateServiceById) {
+    const findService = await this.servicesRepository.findById(payload.serviceId);
     if (!findService) {
       throw new HttpErrors[404](`Service Not FOund!!`);
     }
