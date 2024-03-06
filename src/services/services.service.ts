@@ -53,7 +53,9 @@ export class ServicesService {
   }
 
   async updateServiceById({payload}: UpdateServiceById) {
-    const findService = await this.servicesRepository.findById(payload.serviceId);
+    const findService = await this.servicesRepository.findById(
+      payload.serviceId,
+    );
     if (!findService) {
       throw new HttpErrors[404](`Service Not FOund!!`);
     }
@@ -77,5 +79,17 @@ export class ServicesService {
     );
 
     return updatedServiceById;
+  }
+
+  async deleteServiceById(serviceId: string) {
+    const checkServiceId = await this.servicesRepository.findById(serviceId);
+
+    if (!checkServiceId) {
+      throw new HttpErrors[404](`Service Not Found !!`);
+    }
+
+    await this.servicesRepository.deleteById(checkServiceId.id);
+
+    return {message: 'Service Deleted Successfully!!'};
   }
 }

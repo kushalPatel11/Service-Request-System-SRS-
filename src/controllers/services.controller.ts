@@ -1,5 +1,5 @@
 import {repository} from '@loopback/repository';
-import {get, patch, post, requestBody} from '@loopback/rest';
+import {del, get, patch, post, requestBody} from '@loopback/rest';
 import {ServicesRepository} from '../repositories';
 import {customErrorMsg} from '../keys';
 import {service} from '@loopback/core';
@@ -491,5 +491,58 @@ export class ServicesController {
     },
   ): Promise<void> {
     return this.servicesService.updateServiceById({payload});
+  }
+
+  @del('/services/delete-service', {
+    summary: 'Delete Service by Id API Endpoint',
+    responses: {
+      '200': {
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              required: ['serviceId'],
+              properties: {
+                serviceId: {
+                  type: 'string',
+                  pattern: '^(?! ).*[^ ]$',
+                  errorMessage: {
+                    pattern: `can't be blank`,
+                  },
+                  default: 'Valid MongoDB ID',
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  })
+  async deleteServiceById(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: {
+            type: 'object',
+            required: ['serviceId'],
+            properties: {
+              serviceId: {
+                type: 'string',
+                pattern: '^(?! ).*[^ ]$',
+                errorMessage: {
+                  pattern: `can't be blank`,
+                },
+                default: 'Valid MongoDB ID',
+              },
+            },
+          },
+        },
+      },
+    })
+    payload: {
+      serviceId: string;
+    },
+  ) :Promise<any> {
+    return this.servicesService.deleteServiceById(payload.serviceId)
   }
 }
