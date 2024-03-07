@@ -137,7 +137,7 @@ export class UserService {
       status: serviceGenieConstant.sessionstatus.CURRENT,
       loginAt: DateTime.utc().toJSDate(),
       expireAt: DateTime.utc().plus({
-        minutes: 20,
+        hours: 24,
       }),
     });
 

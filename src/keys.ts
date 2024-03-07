@@ -3,7 +3,7 @@ import {BindingKey} from '@loopback/core';
 
 export namespace TokenServiceConstants {
   export const TOKEN_SECRET_VALUE = 'myJwts3cr3t';
-  export const TOKEN_EXPIRES_IN_VALUE = '12000';
+  export const TOKEN_EXPIRES_IN_VALUE = '86400';
 }
 export namespace TokenServiceBindings {
   export const TOKEN_SECRET = BindingKey.create<string>(
