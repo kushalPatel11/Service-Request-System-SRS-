@@ -136,9 +136,11 @@ export class UserService {
       jwt: token,
       status: serviceGenieConstant.sessionstatus.CURRENT,
       loginAt: DateTime.utc().toJSDate(),
-      expireAt: DateTime.utc().plus({
-        hours: 24,
-      }),
+      expireAt: DateTime.utc()
+        .plus({
+          hours: 24,
+        })
+        .toJSDate(),
     });
 
     let response = {
