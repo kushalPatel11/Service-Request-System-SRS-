@@ -259,6 +259,7 @@ export class ServicesController {
     return this.servicesService.getService();
   }
 
+  @authenticate('jwt')
   @patch('/services/update-service', {
     summary: 'Update Service API Endpoint',
     responses: {
@@ -504,6 +505,7 @@ export class ServicesController {
     return this.servicesService.updateServiceById({payload});
   }
 
+  @authenticate('jwt')
   @del('/services/delete-service', {
     summary: 'Delete Service by Id API Endpoint',
     responses: {
