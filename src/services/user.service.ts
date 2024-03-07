@@ -208,17 +208,23 @@ export class UserService {
 
     let expiredTime = verifyTOken?.forgotPasswordToken?.expiredAt;
     if (
-      DateTime.fromJSDate(
-        <any>verifyTOken.forgotPasswordToken?.expireAt,
-      ).valueOf() < DateTime.utc().valueOf()
+      DateTime.fromJSDate(<any>expiredTime).valueOf() < DateTime.utc().valueOf()
     ) {
       await this.userRepository.updateById(verifyTOken.id, <any>{
         'forgotPasswordToken.status':
           serviceGenieConstant.sessionstatus.EXPIRED,
         'forgotPasswordToken.expiredAt': expiredTime,
+        _v: verifyTOken._v + 1,
       });
       throw new HttpErrors[403](customErrorMsg.authErrors.TOKEN_EXPIRED);
     }
+
+    await this.userRepository.updateById(verifyTOken.id, <any>{
+      'forgotPasswordToken.status': serviceGenieConstant.sessionstatus.EXPIRED,
+      'forgotPasswordToken.expiredAt': DateTime.utc().toJSDate(),
+      _v: verifyTOken._v + 1,
+    });
+
     return verifyTOken.id;
   }
 

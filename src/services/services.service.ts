@@ -1,8 +1,9 @@
 import {injectable, BindingScope} from '@loopback/core';
 import {repository} from '@loopback/repository';
-import {ServicesRepository} from '../repositories';
+import {ServicesRepository, VendorHasServiceRepository} from '../repositories';
 import {HttpErrors} from '@loopback/rest';
 import {DateTime} from 'luxon';
+import {VendorHasService} from '../models';
 
 type AddService = {
   payload: {
@@ -17,6 +18,7 @@ type AddService = {
     price: string;
     website: string;
   };
+  userId: string;
 };
 
 type UpdateServiceById = {
@@ -35,15 +37,25 @@ type UpdateServiceById = {
   };
 };
 
+type GetVendorService = {
+  userId: string;
+};
+
 @injectable({scope: BindingScope.TRANSIENT})
 export class ServicesService {
   constructor(
     @repository(ServicesRepository)
     public servicesRepository: ServicesRepository,
+    @repository(VendorHasServiceRepository)
+    public vendorHasServiceRepository: VendorHasServiceRepository,
   ) {}
 
-  async addService({payload}: AddService) {
+  async addService({payload, userId}: AddService) {
     const addedService = await this.servicesRepository.create(payload);
+    await this.vendorHasServiceRepository.create({
+      serviceId: addedService.id,
+      userId: userId,
+    });
     return addedService;
   }
 
@@ -91,5 +103,27 @@ export class ServicesService {
     await this.servicesRepository.deleteById(checkServiceId.id);
 
     return {message: 'Service Deleted Successfully!!'};
+  }
+
+  async getVendorService({userId}: GetVendorService) {
+    const checkVendor = await this.vendorHasServiceRepository.find({
+      where: {
+        userId: userId,
+      },
+    });
+    if (!checkVendor) {
+      throw new HttpErrors[404](`No Services Found!!`);
+    }
+    let vendorService = [];
+    for (const obj of checkVendor) {
+      const key = obj.serviceId;
+      const value = await this.servicesRepository.findOne({
+        where: {
+          id: key,
+        }
+      });
+      vendorService.push(value);
+    }
+    return vendorService;
   }
 }

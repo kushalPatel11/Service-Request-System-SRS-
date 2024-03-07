@@ -1,9 +1,12 @@
 import {repository} from '@loopback/repository';
 import {del, get, patch, post, requestBody} from '@loopback/rest';
 import {ServicesRepository} from '../repositories';
-import {customErrorMsg} from '../keys';
-import {service} from '@loopback/core';
+import {TokenServiceBindings, customErrorMsg} from '../keys';
+import {inject, service} from '@loopback/core';
 import {ServicesService} from '../services';
+import {TokenService, authenticate} from '@loopback/authentication';
+import {SecurityBindings} from '@loopback/security';
+import {AuthCredentials} from '../services/authentication/jwt.auth.strategy';
 
 export class ServicesController {
   constructor(
@@ -11,8 +14,11 @@ export class ServicesController {
     public servicesRepository: ServicesRepository,
     @service(ServicesService)
     public servicesService: ServicesService,
+    @inject(TokenServiceBindings.TOKEN_SERVICE)
+    public jwtService: TokenService,
   ) {}
 
+  @authenticate('jwt')
   @post('/services/add-service', {
     summary: 'Add vendor Service API Endpoint',
     responses: {
@@ -234,8 +240,13 @@ export class ServicesController {
       price: string;
       website: string;
     },
+    @inject(SecurityBindings.USER)
+    authCredentials: AuthCredentials,
   ): Promise<any> {
-    return this.servicesService.addService({payload});
+    return this.servicesService.addService({
+      payload,
+      userId: <string>authCredentials.user.id,
+    });
   }
 
   @get('/services', {
@@ -532,7 +543,7 @@ export class ServicesController {
                 errorMessage: {
                   pattern: `can't be blank`,
                 },
-                default: 'Valid MongoDB ID',
+                default: '',
               },
             },
           },
@@ -542,7 +553,23 @@ export class ServicesController {
     payload: {
       serviceId: string;
     },
-  ) :Promise<any> {
-    return this.servicesService.deleteServiceById(payload.serviceId)
+  ): Promise<any> {
+    return this.servicesService.deleteServiceById(payload.serviceId);
+  }
+
+  @authenticate('jwt')
+  @get('/services/my-services', {
+    summary: `Get Vendor's Services API Endpoint`,
+    responses: {
+      '200': {},
+    },
+  })
+  async getVendorService(
+    @inject(SecurityBindings.USER)
+    authCredentials: AuthCredentials,
+  ): Promise<any> {
+    return this.servicesService.getVendorService({
+      userId: <string>authCredentials.user.id,
+    });
   }
 }

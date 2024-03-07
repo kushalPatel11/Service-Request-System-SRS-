@@ -3,3 +3,4 @@ export * from './user-credentials.repository';
 export * from './user-session.repository';
 export * from './service-category.repository';
 export * from './services.repository';
+export * from './vendor-has-service.repository';
