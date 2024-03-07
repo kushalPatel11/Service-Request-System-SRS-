@@ -100,7 +100,13 @@ export class ServicesService {
       throw new HttpErrors[404](`Service Not Found !!`);
     }
 
+    const findService : any = await this.vendorHasServiceRepository.findOne({
+      where: {
+        serviceId: checkServiceId.id,
+      },
+    });
     await this.servicesRepository.deleteById(checkServiceId.id);
+    await this.vendorHasServiceRepository.deleteById(findService.id);
 
     return {message: 'Service Deleted Successfully!!'};
   }
@@ -120,7 +126,7 @@ export class ServicesService {
       const value = await this.servicesRepository.findOne({
         where: {
           id: key,
-        }
+        },
       });
       vendorService.push(value);
     }
