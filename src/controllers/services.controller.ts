@@ -260,7 +260,7 @@ export class ServicesController {
   }
 
   @authenticate('jwt')
-  @patch('/services/update-service', {
+  @post('/services/update-service', {
     summary: 'Update Service API Endpoint',
     responses: {
       '200': {
@@ -506,7 +506,7 @@ export class ServicesController {
   }
 
   @authenticate('jwt')
-  @del('/services/delete-service', {
+  @post('/services/delete-service', {
     summary: 'Delete Service by Id API Endpoint',
     responses: {
       '200': {
