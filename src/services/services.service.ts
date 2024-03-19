@@ -1,9 +1,9 @@
-import {injectable, BindingScope} from '@loopback/core';
+import {BindingScope, injectable} from '@loopback/core';
 import {repository} from '@loopback/repository';
-import {ServicesRepository, VendorHasServiceRepository} from '../repositories';
 import {HttpErrors} from '@loopback/rest';
 import {DateTime} from 'luxon';
-import {VendorHasService} from '../models';
+import {ServicesRepository, VendorHasServiceRepository} from '../repositories';
+import {customErrorMsg, serviceGenieConstant} from '../keys';
 
 type AddService = {
   payload: {
@@ -56,7 +56,7 @@ export class ServicesService {
       serviceId: addedService.id,
       userId: userId,
     });
-    return addedService;
+    return serviceGenieConstant.ServiceStatus.SERVICE_CREATE_SUCCESSFUL;
   }
 
   async getService() {
@@ -69,10 +69,9 @@ export class ServicesService {
       payload.serviceId,
     );
     if (!findService) {
-      throw new HttpErrors[404](`Service Not FOund!!`);
+      throw new HttpErrors[404](customErrorMsg.serviceErrors.SERVICE_NOT_FOUND);
     }
-
-    const updatedServiceById = await this.servicesRepository.updateById(
+    await this.servicesRepository.updateById(
       findService.id,
       {
         serviceCategoryId: payload.serviceCategoryId,
@@ -89,18 +88,17 @@ export class ServicesService {
         _v: findService._v + 1,
       },
     );
-
-    return updatedServiceById;
+    return serviceGenieConstant.ServiceStatus.SERVICE_UPDATE_SUCCESSFUL;
   }
 
   async deleteServiceById(serviceId: string) {
     const checkServiceId = await this.servicesRepository.findById(serviceId);
 
     if (!checkServiceId) {
-      throw new HttpErrors[404](`Service Not Found !!`);
+      throw new HttpErrors[404](customErrorMsg.serviceErrors.SERVICE_NOT_FOUND);
     }
 
-    const findService : any = await this.vendorHasServiceRepository.findOne({
+    const findService: any = await this.vendorHasServiceRepository.findOne({
       where: {
         serviceId: checkServiceId.id,
       },
@@ -108,7 +106,7 @@ export class ServicesService {
     await this.servicesRepository.deleteById(checkServiceId.id);
     await this.vendorHasServiceRepository.deleteById(findService.id);
 
-    return {message: 'Service Deleted Successfully!!'};
+    return serviceGenieConstant.ServiceStatus.SERVICE_DELETE_SUCCESSFUL;
   }
 
   async getVendorService({userId}: GetVendorService) {
@@ -118,7 +116,7 @@ export class ServicesService {
       },
     });
     if (!checkVendor) {
-      throw new HttpErrors[404](`No Services Found!!`);
+      throw new HttpErrors[404](customErrorMsg.serviceErrors.SERVICE_NOT_FOUND);
     }
     let vendorService = [];
     for (const obj of checkVendor) {

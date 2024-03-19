@@ -60,6 +60,11 @@ export namespace customErrorMsg {
     ALREADY_EXPIRED_SESSION = 'YOur session has been expired. Please sign in again to continue',
     ALREADY_LOGGED_OUT = 'You have already logged out with this session ID',
   }
+
+  export enum serviceErrors {
+    SERVICE_NOT_FOUND = 'Service Not Found',
+    
+  }
 }
 
 export namespace serviceGenieConstant {
@@ -73,5 +78,11 @@ export namespace serviceGenieConstant {
     LOG_IN_SUCCESS = 'You have logged in successfully',
     LOG_OUT_SUCCESS = 'You have logged out successfully',
     PASSWORD_CHANGE_SUCCESSFULL = 'Password has been changed successfully',
+  }
+
+  export enum ServiceStatus {
+    SERVICE_UPDATE_SUCCESSFUL = 'Service Updated Successfully',
+    SERVICE_CREATE_SUCCESSFUL = 'Service Added Successfully',
+    SERVICE_DELETE_SUCCESSFUL = 'Service Deleted Successfully',
   }
 }

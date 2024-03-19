@@ -1,6 +1,6 @@
 import {Entity, belongsTo, model, property} from '@loopback/repository';
-import {ServiceCategory} from './service-category.model';
 import {DateTime} from 'luxon';
+import {ServiceCategory} from './service-category.model';
 
 @model()
 export class Services extends Entity {
@@ -8,8 +8,9 @@ export class Services extends Entity {
     type: 'string',
     id: true,
     generated: true,
+    mongodb: {dataType: 'ObjectId'},
   })
-  id?: string;
+  id: string;
 
   @belongsTo(
     () => ServiceCategory,

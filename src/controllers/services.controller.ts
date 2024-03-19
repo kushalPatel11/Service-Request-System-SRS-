@@ -388,7 +388,6 @@ export class ServicesController {
               'name',
               'companyName',
               'description',
-              'description',
               'email',
               'phoneNumber',
               'address',
@@ -400,7 +399,7 @@ export class ServicesController {
               serviceId: {
                 type: 'string',
                 pattern: '^(?! ).*[^ ]$',
-                errormessage: {
+                errorMessage: {
                   pattern: `Can't be blank`,
                 },
                 default: 'A valid MongoDB Id',
@@ -408,7 +407,7 @@ export class ServicesController {
               serviceCategoryId: {
                 type: 'string',
                 pattern: '^(?! ).*[^ ]$',
-                errormessage: {
+                errorMessage: {
                   pattern: `Can't be blank`,
                 },
                 default: 'A valid MongoDB Id',
@@ -424,7 +423,7 @@ export class ServicesController {
               companyName: {
                 type: 'string',
                 pattern: '^(?! ).*[^ ]$',
-                errorMesage: {
+                errorMessage: {
                   pattern: `Can't be blank`,
                 },
                 default: 'Updated Comapny Name',
@@ -501,7 +500,7 @@ export class ServicesController {
       price: string;
       website: string;
     },
-  ): Promise<void> {
+  ): Promise<any> {
     return this.servicesService.updateServiceById({payload});
   }
 
