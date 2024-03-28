@@ -1,11 +1,11 @@
-import {repository} from '@loopback/repository';
-import {del, get, patch, post, requestBody} from '@loopback/rest';
-import {ServicesRepository} from '../repositories';
-import {TokenServiceBindings, customErrorMsg} from '../keys';
-import {inject, service} from '@loopback/core';
-import {ServicesService} from '../services';
 import {TokenService, authenticate} from '@loopback/authentication';
+import {inject, service} from '@loopback/core';
+import {repository} from '@loopback/repository';
+import {get, post, requestBody} from '@loopback/rest';
 import {SecurityBindings} from '@loopback/security';
+import {TokenServiceBindings, customErrorMsg} from '../keys';
+import {ServicesRepository} from '../repositories';
+import {EmailService, ServicesService} from '../services';
 import {AuthCredentials} from '../services/authentication/jwt.auth.strategy';
 
 export class ServicesController {
@@ -14,6 +14,8 @@ export class ServicesController {
     public servicesRepository: ServicesRepository,
     @service(ServicesService)
     public servicesService: ServicesService,
+    @service(EmailService)
+    public emailService: EmailService,
     @inject(TokenServiceBindings.TOKEN_SERVICE)
     public jwtService: TokenService,
   ) {}
@@ -572,5 +574,125 @@ export class ServicesController {
     return this.servicesService.getVendorService({
       userId: <string>authCredentials.user.id,
     });
+  }
+
+  // @authenticate('jwt')
+  @post('/services/service-request-email', {
+    summary: 'Send Email to vendor after requesting service API ENdpoint',
+    responses: {
+      '200': {
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              required: ['email'],
+              properties: {
+                email: {
+                  type: 'string',
+                  format: 'email',
+                  errorMessage: {
+                    pattern: `Invalid email`,
+                  },
+                  default: '',
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  })
+  async sendEmailToVendor(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: {
+            type: 'object',
+            required: ['email'],
+            properties: {
+              email: {
+                type: 'string',
+                format: 'email',
+                errorMessage: {
+                  pattern: `Invalid email`,
+                },
+                default: '',
+              },
+            },
+          },
+        },
+      },
+    })
+    payload: {
+      email: string;
+    },
+  ): Promise<any> {
+    return this.emailService.sendRequestToVendor(payload.email);
+  }
+
+  // @authenticate('jwt')
+  @post('/services/send-service-status', {
+    summary: 'Send Email to customer after managing request API ENdpoint',
+    responses: {
+      '200': {
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              required: ['email', 'status'],
+              properties: {
+                email: {
+                  type: 'string',
+                  format: 'email',
+                  errorMessage: {
+                    pattern: `Invalid email`,
+                  },
+                  default: '',
+                },
+                status: {
+                  type: 'string',
+                  default: '',
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  })
+  async sendResponseToCustomer(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: {
+            type: 'object',
+            required: ['email', 'status'],
+            properties: {
+              email: {
+                type: 'string',
+                format: 'email',
+                errorMessage: {
+                  pattern: `Invalid email`,
+                },
+                default: '',
+              },
+              status: {
+                type: 'string',
+                default: '',
+              },
+            },
+          },
+        },
+      },
+    })
+    payload: {
+      email: string;
+      status: string;
+    },
+  ): Promise<any> {
+    return this.emailService.serviceAcceptDecline(
+      payload.email,
+      payload.status,
+    );
   }
 }

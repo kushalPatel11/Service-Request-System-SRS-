@@ -1,27 +1,23 @@
-import {injectable, BindingScope, inject, service} from '@loopback/core';
-import {repository} from '@loopback/repository';
-import {UserProfile, securityId} from '@loopback/security';
-import {
-  UserCredentialsRepository,
-  UserRepository,
-  UserSessionRepository,
-} from '../repositories';
-import {User, UserWithRelations} from '../models';
-import {HttpErrors} from '@loopback/rest';
 import {TokenService} from '@loopback/authentication';
+import {BindingScope, inject, injectable, service} from '@loopback/core';
+import {repository} from '@loopback/repository';
+import {HttpErrors} from '@loopback/rest';
+import {UserProfile, securityId} from '@loopback/security';
+import {compare, hashSync} from 'bcryptjs';
+import _ from 'lodash';
+import {DateTime} from 'luxon';
 import {
   TokenServiceBindings,
   customErrorMsg,
   serviceGenieConstant,
 } from '../keys';
-import {compare, hashSync} from 'bcryptjs';
-import {DateTime} from 'luxon';
-import _ from 'lodash';
+import {User, UserWithRelations} from '../models';
 import {
-  checkOldPasswords,
-  generateRandomNumber,
-  generateRandomString,
-} from '../utils/helper';
+  UserCredentialsRepository,
+  UserRepository,
+  UserSessionRepository,
+} from '../repositories';
+import {checkOldPasswords, generateRandomNumber} from '../utils/helper';
 // import { serviceProxy } from '@loopback/service-proxy';
 import {EmailService} from './email.service';
 
