@@ -7,14 +7,14 @@ export class EmailService {
 
   async sendOTP(email: string, otp: number): Promise<void> {
     // Create reusable transporter object using SMTP transport
-     let transporter = nodemailer.createTransport({
-       host: 'smtp.elasticemail.com',
-       port: 2525,
-       auth: {
-         user: 'kushalpatel1218@gmail.com',
-         pass: 'AF53599083CA0DD2934CF4D6F158B84672BA',
-       },
-     });
+    let transporter = nodemailer.createTransport({
+      host: 'smtp.elasticemail.com',
+      port: 2525,
+      auth: {
+        user: 'kushalpatel1218@gmail.com',
+        pass: 'AF53599083CA0DD2934CF4D6F158B84672BA',
+      },
+    });
 
     // Send mail with defined transport object
     let info = await transporter.sendMail({
@@ -46,7 +46,7 @@ export class EmailService {
     // console.log('Message sent: %s', info.messageId);
   }
 
-  async sendRequestToVendor(email:string) {
+  async sendRequestToVendor(email: string) {
     // Create reusable transporter object using SMTP transport
     let transporter = nodemailer.createTransport({
       host: 'smtp.elasticemail.com',
@@ -62,12 +62,12 @@ export class EmailService {
       from: 'kushalpatel1218@gmail.com',
       to: email,
       subject: 'New Service Request',
-      text: 'You have a new service request from a customer. Log in to your portal to manage the request.'
+      text: 'You have a new service request from a customer. Log in to your portal to manage the request.',
       // text: `Your OTP is: ${otp}, \nIt will expire in 5 Minutes`,
     });
   }
 
-  async serviceAcceptDecline(email: string, status:string){
+  async serviceAcceptDecline(email: string, status: string) {
     // Create reusable transporter object using SMTP transport
     let transporter = nodemailer.createTransport({
       host: 'smtp.elasticemail.com',
@@ -83,7 +83,28 @@ export class EmailService {
       from: 'kushalpatel1218@gmail.com',
       to: email,
       subject: 'Update on your Request',
-      text: `Your service request has been ${status}. Please login to your portal to view and manage the request.`
+      text: `Your service request has been ${status}. Please login to your portal to view and manage the request.`,
+      // text: `Your OTP is: ${otp}, \nIt will expire in 5 Minutes`,
+    });
+  }
+
+  async serviceCancle(email: string) {
+    // Create reusable transporter object using SMTP transport
+    let transporter = nodemailer.createTransport({
+      host: 'smtp.elasticemail.com',
+      port: 2525,
+      auth: {
+        user: 'kushalpatel1218@gmail.com',
+        pass: 'AF53599083CA0DD2934CF4D6F158B84672BA',
+      },
+    });
+
+    // Send mail with defined transport object
+    let info = await transporter.sendMail({
+      from: 'kushalpatel1218@gmail.com',
+      to: email,
+      subject: 'Update on your Appointment',
+      text: `Your appoitnment has been canceled. Please login to your portal to view and manage the request.`,
       // text: `Your OTP is: ${otp}, \nIt will expire in 5 Minutes`,
     });
   }

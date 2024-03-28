@@ -647,7 +647,7 @@ export class ServicesController {
                   errorMessage: {
                     pattern: `Invalid email`,
                   },
-                  default: '',
+                  default: 'nishchitpatel84@gmail.com',
                 },
                 status: {
                   type: 'string',
@@ -674,7 +674,7 @@ export class ServicesController {
                 errorMessage: {
                   pattern: `Invalid email`,
                 },
-                default: '',
+                default: 'nishchitpatel84@gmail.com',
               },
               status: {
                 type: 'string',
@@ -694,5 +694,58 @@ export class ServicesController {
       payload.email,
       payload.status,
     );
+  }
+
+  @post('/services/cancle-request-email', {
+    summary: 'Send Email to vendor after cancelling appointment API ENdpoint',
+    responses: {
+      '200': {
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              required: ['email'],
+              properties: {
+                email: {
+                  type: 'string',
+                  format: 'email',
+                  errorMessage: {
+                    pattern: `Invalid email`,
+                  },
+                  default: 'nishchitpatel84@gmail.com',
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  })
+  async cancelEMail(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: {
+            type: 'object',
+            required: ['email'],
+            properties: {
+              email: {
+                type: 'string',
+                format: 'email',
+                errorMessage: {
+                  pattern: `Invalid email`,
+                },
+                default: '',
+              },
+            },
+          },
+        },
+      },
+    })
+    payload: {
+      email: string;
+    },
+  ): Promise<any> {
+    return this.emailService.serviceCancle(payload.email);
   }
 }
