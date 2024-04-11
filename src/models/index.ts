@@ -5,3 +5,4 @@ export * from './forgot-password-data.model';
 export * from './service-category.model';
 export * from './services.model';
 export * from './vendor-has-service.model';
+export * from './vendor-has-service-request.model';

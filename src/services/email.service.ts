@@ -1,4 +1,4 @@
-import {injectable, BindingScope} from '@loopback/core';
+import {BindingScope, injectable} from '@loopback/core';
 import nodemailer from 'nodemailer';
 
 @injectable({scope: BindingScope.TRANSIENT})
@@ -105,6 +105,27 @@ export class EmailService {
       to: email,
       subject: 'Update on your Appointment',
       text: `Your appoitnment has been canceled. Please login to your portal to view and manage the request.`,
+      // text: `Your OTP is: ${otp}, \nIt will expire in 5 Minutes`,
+    });
+  }
+
+  async servicePurchase(email: string) {
+    // Create reusable transporter object using SMTP transport
+    let transporter = nodemailer.createTransport({
+      host: 'smtp.elasticemail.com',
+      port: 2525,
+      auth: {
+        user: 'kushalpatel1218@gmail.com',
+        pass: 'AF53599083CA0DD2934CF4D6F158B84672BA',
+      },
+    });
+
+    // Send mail with defined transport object
+    let info = await transporter.sendMail({
+      from: 'kushalpatel1218@gmail.com',
+      to: email,
+      subject: 'Order Placed Successfully',
+      text: `Thank You for your purchase on our platform. \nThis is to inform you that we have recieved your order and your payment was a success.`,
       // text: `Your OTP is: ${otp}, \nIt will expire in 5 Minutes`,
     });
   }

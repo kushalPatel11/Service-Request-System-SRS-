@@ -748,4 +748,58 @@ export class ServicesController {
   ): Promise<any> {
     return this.emailService.serviceCancle(payload.email);
   }
+
+  @post('/services/payment-success', {
+    summary:
+      'Send Email to customer after a successful order placement and payment API ENdpoint',
+    responses: {
+      '200': {
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              required: ['email'],
+              properties: {
+                email: {
+                  type: 'string',
+                  format: 'email',
+                  errorMessage: {
+                    pattern: `Invalid email`,
+                  },
+                  default: 'nishchitpatel84@gmail.com',
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  })
+  async servicePurchase(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: {
+            type: 'object',
+            required: ['email'],
+            properties: {
+              email: {
+                type: 'string',
+                format: 'email',
+                errorMessage: {
+                  pattern: `Invalid email`,
+                },
+                default: '',
+              },
+            },
+          },
+        },
+      },
+    })
+    payload: {
+      email: string;
+    },
+  ): Promise<any> {
+    return this.emailService.servicePurchase(payload.email);
+  }
 }
