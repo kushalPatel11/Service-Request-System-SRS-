@@ -129,4 +129,46 @@ export class EmailService {
       // text: `Your OTP is: ${otp}, \nIt will expire in 5 Minutes`,
     });
   }
+
+  async disableNotification(email: string) {
+    // Create reusable transporter object using SMTP transport
+    let transporter = nodemailer.createTransport({
+      host: 'smtp.elasticemail.com',
+      port: 2525,
+      auth: {
+        user: 'kushalpatel1218@gmail.com',
+        pass: 'AF53599083CA0DD2934CF4D6F158B84672BA',
+      },
+    });
+
+    // Send mail with defined transport object
+    let info = await transporter.sendMail({
+      from: 'kushalpatel1218@gmail.com',
+      to: email,
+      subject: 'Notification Setting Updated',
+      text: `You have opted out from receiving notifications. \nYou won't receive any update notifications from now on.`,
+      // text: `Your OTP is: ${otp}, \nIt will expire in 5 Minutes`,
+    });
+  }
+
+  async enableNotification(email: string) {
+    // Create reusable transporter object using SMTP transport
+    let transporter = nodemailer.createTransport({
+      host: 'smtp.elasticemail.com',
+      port: 2525,
+      auth: {
+        user: 'kushalpatel1218@gmail.com',
+        pass: 'AF53599083CA0DD2934CF4D6F158B84672BA',
+      },
+    });
+
+    // Send mail with defined transport object
+    let info = await transporter.sendMail({
+      from: 'kushalpatel1218@gmail.com',
+      to: email,
+      subject: 'Notification Setting Updated',
+      text: `You have turned on your notification setting. \nYou will start receiving update notifications from now on.`,
+      // text: `Your OTP is: ${otp}, \nIt will expire in 5 Minutes`,
+    });
+  }
 }

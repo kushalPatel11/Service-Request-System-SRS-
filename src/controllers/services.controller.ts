@@ -802,4 +802,112 @@ export class ServicesController {
   ): Promise<any> {
     return this.emailService.servicePurchase(payload.email);
   }
+
+  @post('/services/disable-notification', {
+    summary:
+      'Send Email to customer after a successful order placement and payment API ENdpoint',
+    responses: {
+      '200': {
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              required: ['email'],
+              properties: {
+                email: {
+                  type: 'string',
+                  format: 'email',
+                  errorMessage: {
+                    pattern: `Invalid email`,
+                  },
+                  default: 'nishchitpatel84@gmail.com',
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  })
+  async disableNotification(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: {
+            type: 'object',
+            required: ['email'],
+            properties: {
+              email: {
+                type: 'string',
+                format: 'email',
+                errorMessage: {
+                  pattern: `Invalid email`,
+                },
+                default: '',
+              },
+            },
+          },
+        },
+      },
+    })
+    payload: {
+      email: string;
+    },
+  ): Promise<any> {
+    return this.emailService.disableNotification(payload.email);
+  }
+
+  @post('/services/enable-notification', {
+    summary:
+      'Send Email to customer after a successful order placement and payment API ENdpoint',
+    responses: {
+      '200': {
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              required: ['email'],
+              properties: {
+                email: {
+                  type: 'string',
+                  format: 'email',
+                  errorMessage: {
+                    pattern: `Invalid email`,
+                  },
+                  default: 'nishchitpatel84@gmail.com',
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  })
+  async enableNotification(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: {
+            type: 'object',
+            required: ['email'],
+            properties: {
+              email: {
+                type: 'string',
+                format: 'email',
+                errorMessage: {
+                  pattern: `Invalid email`,
+                },
+                default: '',
+              },
+            },
+          },
+        },
+      },
+    })
+    payload: {
+      email: string;
+    },
+  ): Promise<any> {
+    return this.emailService.enableNotification(payload.email);
+  }
 }
